@@ -22,7 +22,9 @@ module EventStore
 
             headers = self.headers(expected_version)
 
-            response = post.(data, uri, headers)
+            response = Retry.(session.connection) do
+              post.(data, uri, headers)
+            end
 
             if response.status_code == 400 && response.reason_phrase == 'Wrong expected EventNumber'
               error_message = "Wrong expected version number: #{expected_version} (URI: #{uri})"

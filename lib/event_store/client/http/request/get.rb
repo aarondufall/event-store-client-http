@@ -11,7 +11,10 @@ module EventStore
             logger.opt_trace "Issuing GET (URI: #{uri})"
 
             uri = session.build_uri(uri)
-            response = ::HTTP::Commands::Get.(uri, headers, connection: session.connection)
+
+            response = Retry.(session.connection) do
+              ::HTTP::Commands::Get.(uri, headers, connection: session.connection)
+            end
 
             body = response.body
 
